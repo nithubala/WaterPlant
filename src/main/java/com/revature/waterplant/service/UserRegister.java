@@ -1,9 +1,11 @@
-package com.revature.waterplant.Controller;
+package com.revature.waterplant.service;
 
 import java.util.Scanner;
 
-import com.revature.waterplant.DAO.UserDAO;
-import com.revature.waterplant.Model.User;
+import com.revature.waterplant.dao.UserDAO;
+import com.revature.waterplant.dao.UserDAOImp;
+import com.revature.waterplant.exception.DBException;
+import com.revature.waterplant.model.User;
 
 public class UserRegister {
 static Scanner s=new Scanner(System.in); 
@@ -29,8 +31,12 @@ static Scanner s=new Scanner(System.in);
 		user.setMobileNo(mobileNo);
 		
 		System.out.println(user);
-		
-		UserDAO.register(user);
+		UserDAOImp dao=new UserDAO();
+		try {
+			dao.register(user);
+		} catch (DBException e) {
+			e.printStackTrace();
+		}
 		System.out.println("------REGISTERED SUCCESSFULLY-------");
 		user=Login.login();
 		return user;

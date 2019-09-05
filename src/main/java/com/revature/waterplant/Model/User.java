@@ -1,4 +1,4 @@
-package com.revature.waterplant.Model;
+package com.revature.waterplant.model;
 
 public class User {
 

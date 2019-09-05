@@ -1,22 +1,23 @@
-package com.revature.waterplant.DAO;
+package com.revature.waterplant.dao;
 
 import java.sql.Connection;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
 
+import com.revature.waterplant.exception.DBException;
+import com.revature.waterplant.model.User;
+import com.revature.waterplant.util.ConnectionUtil;
 
-import com.revature.waterplant.Model.User;
-import com.revature.waterplant.Util.ConnectionUtil;
+public class UserDAO implements UserDAOImp {
 
-public class UserDAO {
-
-	public static void register(User user) {
+	public void register(User user) throws DBException {
 		
-		
-			Connection con=ConnectionUtil.getConnection();
+		Connection con =null;
+		PreparedStatement pst = null;
+		con=ConnectionUtil.getConnection();
 			String sql="insert into userdetails (User_name,Email_id,Password,Address,Mobile_no) values( ?,?,?,?,?)";
-			PreparedStatement pst;
+		
 			try {
 				pst = con.prepareStatement(sql);
 				pst.setString(1,user.getName());
@@ -29,18 +30,23 @@ public class UserDAO {
 			} catch (SQLException e) {
 				
 				e.printStackTrace();
-				throw new RuntimeException("Unable to register");
+				throw new DBException("Unable to register",e);
+			}
+			finally {
+				ConnectionUtil.close(con, pst);
 			}
 			
 	}
 	
-	public static boolean login(String emailId, String password) {
+	public boolean login(String emailId, String password) throws DBException {
 
-		Connection con = ConnectionUtil.getConnection();
+		Connection con =null;
+		PreparedStatement pst = null;
+		con = ConnectionUtil.getConnection();
 		String sql = "select * from userdetails where Email_id=? and Password=?";
 		boolean isValid = false;
 		try {
-			PreparedStatement pst = con.prepareStatement(sql);
+			pst = con.prepareStatement(sql);
 			pst.setString(1, emailId);
 			pst.setString(2, password);
 			ResultSet rs = pst.executeQuery();
@@ -52,18 +58,20 @@ public class UserDAO {
 			}
 
 		} catch (SQLException e) {
-			throw new RuntimeException("Unable to login");
+			throw new DBException("Unable to login",e);
+		}
+		finally {
+			ConnectionUtil.close(con, pst);
 		}
 		return isValid;
 
 	}
 	
-	public static User getUserID(String emailId) {
-
-		Connection con = ConnectionUtil.getConnection();
+	public User getUserID(String emailId) {
+		Connection con =null;
+		PreparedStatement pst = null;
+		con = ConnectionUtil.getConnection();
 		String sql = "select * from userdetails where Email_id=?";
-		PreparedStatement pst;
-		int id = 0;
 		User user=null;
 		try {
 			pst = con.prepareStatement(sql);
@@ -83,6 +91,9 @@ public class UserDAO {
          } catch (SQLException e) {
 
 			e.printStackTrace();
+		}
+		finally {
+			ConnectionUtil.close(con, pst);
 		}
         return user;
 

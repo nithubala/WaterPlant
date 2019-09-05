@@ -1,21 +1,23 @@
-package com.revature.waterplant.DAO;
+package com.revature.waterplant.dao;
 
 import java.sql.Connection;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
 
-import com.revature.waterplant.Model.User;
-import com.revature.waterplant.Util.ConnectionUtil;
+import com.revature.waterplant.exception.DBException;
+import com.revature.waterplant.model.User;
+import com.revature.waterplant.util.ConnectionUtil;
 
-public class ReserveDAO {
+public class ReserveDAO implements ReserveDAOImp{
 
-	public static void addReserve(User user, int reservedCans) {
+	public  void addReserve(User user, int reservedCans) throws DBException {
 		
-		Connection con = ConnectionUtil.getConnection();
+		Connection con =null;
+		PreparedStatement pst = null;
+		con= ConnectionUtil.getConnection();
 		String sql = "insert into reservedetails(User_id,User_name,Mobile_no,Reserved_cans,Reserved_status) values"
 				+ "(?,?,?,?,?) ";
-		PreparedStatement pst;
 		try {
 			pst = con.prepareStatement(sql);
 			pst.setInt(1, user.getId());
@@ -26,17 +28,20 @@ public class ReserveDAO {
 			pst.executeUpdate();
 		} catch (SQLException e) {
 			e.printStackTrace();
-			throw new RuntimeException("Unable to reserve");
+			throw new DBException("Unable to reserve",e);
 		}
 		
-		
+		finally {
+			ConnectionUtil.close(con, pst);
+		}
 	}
 
-	public static User findById(int id) {
+	public User findById(int id) {
 		
-		Connection con = ConnectionUtil.getConnection();
+		Connection con =null;
+		PreparedStatement pst = null;
+	    con = ConnectionUtil.getConnection();
 		String sql = "select * from reservedetails where User_id=? and Reserved_status='Order Pending' ";
-		PreparedStatement pst;
 		User user=null;
 		try {
 			pst = con.prepareStatement(sql);
@@ -45,7 +50,7 @@ public class ReserveDAO {
 		
 			if(rs.next()) {
 			    user = new User();
-				user.setId(rs.getInt("Reserve_id"));
+				user.setReserveId(rs.getInt("Reserve_id"));
 				user.setName(rs.getString("User_name"));
 				user.setMobileNo(rs.getLong("Mobile_no"));
 				user.setNoOfCans(rs.getInt("Reserved_cans"));
@@ -56,32 +61,41 @@ public class ReserveDAO {
 			
 			e.printStackTrace();
 		}
+		finally {
+			ConnectionUtil.close(con, pst);
+		}
 		
 		return user;
 	}
 
-	public static void updateReserve(User user, int reservedCans) {
+	public  void updateReserve(User u, int reservedCans) throws DBException {
 		
-		Connection con = ConnectionUtil.getConnection();
-		String sql = "update reservedetails set Reserved_cans = ? where User_id= ?";
-		PreparedStatement pst;
+		Connection con =null;
+		PreparedStatement pst = null;
+		con = ConnectionUtil.getConnection();
+		String sql = "update reservedetails set Reserved_cans = ? where Reserve_id= ?";
 		try {
 			pst = con.prepareStatement(sql);
 			pst.setInt(1,reservedCans);
-			pst.setInt(2, user.getId());
+			pst.setInt(2, u.getReserveId());
 			pst.executeUpdate();
 		} catch (SQLException e) {
 			
 			e.printStackTrace();
+			throw new DBException("Unable to reserve",e);
 		}
 		
-		
+		finally {
+			ConnectionUtil.close(con, pst);
+		}
 	}
 
-	public static User findByReserveId(int id) {
-		Connection con = ConnectionUtil.getConnection();
+	public  User findByReserveId(int id) {
+		
+		Connection con =null;
+		PreparedStatement pst = null;
+		con = ConnectionUtil.getConnection();
 		String sql = "select * from reservedetails where Reserve_id= ? and Reserved_status='Order Pending'";
-		PreparedStatement pst;
 		User user=null;
 		try {
 			pst = con.prepareStatement(sql);
@@ -101,26 +115,35 @@ public class ReserveDAO {
 		} catch (SQLException e) {
 			
 			e.printStackTrace();
+			
+		}
+		finally {
+			ConnectionUtil.close(con, pst);
 		}
 		
 		return user;
 	}
 
-public static void updateStatus(User u) {
-		
-		Connection con = ConnectionUtil.getConnection();
-		String sql = "update reservedetails set Reserved_status ='Ordered' where Reserve_id= ?";
-		PreparedStatement pst;
+public  void updateStatus(User u,int orderedCans) {
+	
+	    Connection con =null;
+	    PreparedStatement pst = null;
+		con = ConnectionUtil.getConnection();
+		String sql = "update reservedetails set Reserved_status ='Ordered',Ordered_cans=? where Reserve_id= ?";
 		try {
 			pst = con.prepareStatement(sql);
-			pst.setInt(1,u.getReserveId());
+			pst.setInt(1,orderedCans);
+			pst.setInt(2,u.getReserveId());
+			
 			pst.executeUpdate();
 		} catch (SQLException e) {
 			
 			e.printStackTrace();
 		}
 		
-		
+		finally {
+			ConnectionUtil.close(con, pst);
+		}
 	}
 
 	

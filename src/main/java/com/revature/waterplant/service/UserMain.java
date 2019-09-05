@@ -1,8 +1,8 @@
-package com.revature.waterplant.Controller;
+package com.revature.waterplant.service;
 
 import java.util.Scanner;
 
-import com.revature.waterplant.Model.User;
+import com.revature.waterplant.model.User;
 
 public class UserMain {
 	
@@ -25,9 +25,9 @@ public class UserMain {
 					System.out.println("Select your option");
 					System.out.println("1 ---->View Stock");
 					System.out.println("2 ---->Update Stock");
-					System.out.println("3 ---->View order details");
-					System.out.println("4 ---->View Reserve details");
-					System.out.println("5 ---->Quit");
+					/*System.out.println("3 ---->View order details");
+					System.out.println("4 ---->View Reserve details");*/
+					System.out.println("3 ---->Quit");
 
 					int ch = sc.nextInt();
 
@@ -40,18 +40,18 @@ public class UserMain {
 
 						UpdateStock.stockUpdate();
 						break;
-					case 3:
+					/*case 3:
 
 						break;
 					case 4:
-						break;
-					case 5:
+						break;*/
+					case 3:
 						bool = false;
 						break;
 
 					default:
 
-						System.out.println("---INVALID CHOICE---\n");
+						System.out.println("-----INVALID CHOICE-----\n");
 						break;
 					}
 					System.out.println("If you want to continue\n");
@@ -72,7 +72,6 @@ public class UserMain {
 			}
 		}
 
-		// System.out.println(select);
 		while (select.equals("NewUser") || select.equals("ExistingUser")) {
 
 			do {

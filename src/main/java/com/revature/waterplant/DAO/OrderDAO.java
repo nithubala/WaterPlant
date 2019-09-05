@@ -1,20 +1,22 @@
-package com.revature.waterplant.DAO;
+package com.revature.waterplant.dao;
 
 import java.sql.Connection;
 import java.sql.PreparedStatement;
 import java.sql.SQLException;
 
-import com.revature.waterplant.Model.User;
-import com.revature.waterplant.Util.ConnectionUtil;
+import com.revature.waterplant.exception.DBException;
+import com.revature.waterplant.model.User;
+import com.revature.waterplant.util.ConnectionUtil;
 
-public class OrderDAO {
+public class OrderDAO implements OrderDAOImp {
 
-	public static void addOrder(User u, int noOfCans) {
-	
-		Connection con = ConnectionUtil.getConnection();
+	public void addOrder(User u, int noOfCans) throws DBException {
+		
+		Connection con =null;
+		PreparedStatement pst = null;
+		con = ConnectionUtil.getConnection();
 		String sql = "insert into orderdetails(User_id,User_name,Mobile_no,Address,Ordered_cans) values"
 				+ "(?,?,?,?,?) ";
-		PreparedStatement pst;
 		try {
 			pst = con.prepareStatement(sql);
 			pst.setInt(1, u.getId());
@@ -25,17 +27,21 @@ public class OrderDAO {
 			pst.executeUpdate();
 		} catch (SQLException e) {
 			e.printStackTrace();
-			throw new RuntimeException("Unable to order");
+			throw new DBException("Unable to order Cans", e);
+		}
+		finally {
+			ConnectionUtil.close(con, pst);
 		}
 		
 }
 
-	public static void addReserveOrder(User u, String Address) {
+	public  void addReserveOrder(User u,int orderedCans, String Address) throws DBException {
 		
-		Connection con = ConnectionUtil.getConnection();
+		Connection con =null;
+		PreparedStatement pst = null;
+		con = ConnectionUtil.getConnection();
 		String sql = "insert into orderdetails(User_id,Reserve_id,User_name,Mobile_no,Address,Ordered_cans) values"
 				+ "(?,?,?,?,?,?) ";
-		PreparedStatement pst;
 		try {
 			pst = con.prepareStatement(sql);
 			pst.setInt(1, u.getId());
@@ -43,11 +49,14 @@ public class OrderDAO {
 			pst.setString(3,u.getName());
 			pst.setLong(4,u.getMobileNo());
 			pst.setString(5, Address);
-			pst.setInt(6,u.getNoOfCans());
+			pst.setInt(6,orderedCans);
 			pst.executeUpdate();
 		} catch (SQLException e) {
 			e.printStackTrace();
-			throw new RuntimeException("Unable to order");
+			throw new DBException("Unable to order Reserved Cans",e);
+		}
+		finally {
+			ConnectionUtil.close(con, pst);
 		}
 	}
 	
